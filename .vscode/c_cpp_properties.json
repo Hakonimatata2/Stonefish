@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/include",
+                "/usr/local/include/Stonefish",
+                "/usr/include/freetype2"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compilerArgs": [
+                "${workspaceFolder}/**",
+                "/usr/local/include",
+                "/usr/local/include/Stonefish",
+                "/usr/include/freetype2"
+            ]
+        }
+    ],
+    "version": 4
+}

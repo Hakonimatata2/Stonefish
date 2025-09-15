@@ -1,0 +1,3 @@
+/home/haakonaardal/Stonefish/fist sim/build/CMakeFiles/MySim.dir
+/home/haakonaardal/Stonefish/fist sim/build/CMakeFiles/edit_cache.dir
+/home/haakonaardal/Stonefish/fist sim/build/CMakeFiles/rebuild_cache.dir

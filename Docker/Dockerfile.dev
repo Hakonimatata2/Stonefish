@@ -1,0 +1,14 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  build-essential cmake ninja-build ccache git pkg-config gdb \
+  libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev libxxf86vm-dev libgtk-3-dev \
+  libeigen3-dev libassimp-dev libopencv-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+# Valgfritt: bruk ccache for raskere re-builds
+ENV CCACHE_DIR=/ccache
+ENV CC="ccache gcc" CXX="ccache g++"
+
+WORKDIR /work
