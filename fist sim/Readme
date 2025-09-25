@@ -2,3 +2,9 @@ cd build
 cmake ..
 cmake --build . -j
 ./MySim
+
+
+Eller bruk:
+
+CTRL + Shift + P -> CMake: Build
+Shift + F5

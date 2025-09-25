@@ -963,4 +963,5 @@ CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o: \
  /usr/local/include/Stonefish/utils/UnitSystem.h \
  /usr/local/include/Stonefish/core/ScenarioParser.h \
  /usr/local/include/Stonefish/tinyxml2.h \
- /usr/local/include/Stonefish/core/NED.h
+ /usr/local/include/Stonefish/core/NED.h \
+ /usr/local/include/Stonefish/entities/solids/Polyhedron.h

@@ -53,23 +53,25 @@ void UnderwaterTestApp::DoHUD()
 {
     GraphicalSimulationApp::DoHUD();
 
-    /*sf::Uid id;
+    /*
+    sf::Uid id;
     id.owner = 10;
     id.item = 0;
-
+    
     sf::Servo* srv1 = (sf::Servo*)getSimulationManager()->getActuator("LOLO/Servo1");
     sf::Servo* srv2 = (sf::Servo*)getSimulationManager()->getActuator("LOLO/Servo2");
     sf::Scalar sp = getGUI()->DoSlider(id, 180.f, 10.f, 150.f, sf::Scalar(-1), sf::Scalar(1), srv1->getPosition(), "Servo1");
     srv1->setDesiredPosition(sp);
     srv2->setDesiredPosition(sp);
-
+    
     id.item = 1;
-
+    
     sf::Thruster* th1 = (sf::Thruster*)getSimulationManager()->getActuator("LOLO/ThrusterSurge1");
     sf::Thruster* th2 = (sf::Thruster*)getSimulationManager()->getActuator("LOLO/ThrusterSurge2");
     sf::Scalar sp2 = getGUI()->DoSlider(id, 180.f, 60.f, 150.f, sf::Scalar(-1), sf::Scalar(1), th1->getSetpoint(), "Surge");
     th1->setSetpoint(sp2);
-    th2->setSetpoint(sp2);*/
+    th2->setSetpoint(sp2);
+    */
     
     /*
     sf::Uid id;
