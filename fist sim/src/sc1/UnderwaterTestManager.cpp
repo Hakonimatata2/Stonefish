@@ -50,6 +50,8 @@
 #include <core/ScenarioParser.h>
 #include <core/NED.h>
 #include <Stonefish/entities/solids/Polyhedron.h>
+#include <core/GeneralRobot.h>
+#include <LinearMath/btTransform.h>
 
 UnderwaterTestManager::UnderwaterTestManager(sf::Scalar stepsPerSecond)
 : SimulationManager(stepsPerSecond, sf::SolverType::SOLVER_SI, sf::CollisionFilteringType::COLLISION_EXCLUSIVE)
@@ -58,41 +60,83 @@ UnderwaterTestManager::UnderwaterTestManager(sf::Scalar stepsPerSecond)
 
 void UnderwaterTestManager::BuildScenario()
 {
-    ///////MATERIALS////////
+    // -------------- MATERIALS--------------
     CreateMaterial("Fiberglass", sf::UnitSystem::Density(sf::CGS, sf::MKS, 1.0), 0.3);
+    CreateMaterial("Dummy", sf::UnitSystem::Density(sf::CGS, sf::MKS, 1.0), 0.3);
     SetMaterialsInteraction("Fiberglass", "Fiberglass", 0.5, 0.2);
     
-    ///////LOOKS///////////
+    // -------------- LOOKS--------------
     CreateLook("white", sf::Color::Gray(1.f), 0.9f, 0.0f, 0.f);
 
+
+    // -------------- OCEAN--------------
     EnableOcean(0.0);
     getOcean()->EnableCurrents();
     getAtmosphere()->SetSunPosition(0.0, 45.0);
 
+    // -------------- Physics--------------
     sf::BodyPhysicsSettings phy;
     phy.mode = sf::BodyPhysicsMode::SUBMERGED;
     phy.collisions = true;
     phy.buoyancy = true;
+    
 
-    auto vehicle_vis_obj = sf::GetDataPath() + "ResiFarmBlueRov.obj";
-    // auto vehicle_vis_obj = sf::GetDataPath() + "sphere_R=1.obj";
-    auto vehicle_phy_obj = sf::GetDataPath() + "sphere_R=1.obj";
-
-    sf::Transform position = sf::Transform(sf::IQ(), sf::Vector3(0.0, -10.0, 0.0));
+    // -------------- Positions--------------
+    
+    //        I BLENDER             x         z       -y
+    auto to_ref     = sf::Vector3(-0.1178, -0.6932, 0.3703);
+    auto to_dvl     = sf::Vector3(-0.2883, -0.6684, 0.2624);
+    auto to_mbs     = sf::Vector3(-0.2883, -0.6599, 0.4908);
+    auto to_ping    = sf::Vector3(-0.4100, -0.4906, 0.5206);
+    
+    auto rel_mbs = to_ref - to_mbs;
+    auto rel_ping = to_ref - to_ping;
+    
+    
+    // -------------- DEFINING THE VEHICLE --------------
 
     sf::Polyhedron* vehicle = new sf::Polyhedron(
-        "ROV",                 // navn
-        phy,                   // BodyPhysicsSettings
-        vehicle_vis_obj,
-        0.01,                  // scale
-        position,              // origin transform (identity matrix)
-        vehicle_phy_obj,
+        "ROV",                                          // navn
+        phy,                                            // BodyPhysicsSettings
+        sf::GetDataPath() + "ResiFarmBlueRov.obj",      // Vsible object
+        0.01,                                           // scale
+        sf::Transform(sf::IQ(), to_ref),                // origin transform (identity matrix)
+        sf::GetDataPath() + "sphere_R=1.obj",           // Physical object
         1.0,
-        position,
+        sf::I4(),
         "Fiberglass",          // material
         "white"                // look
     );
-    vehicle->isBuoyant();
-    // vehicle->SetArbitraryPhysicalProperties(2.0, sf::Vector3(1.0, 0.5, 0.2), sf::Transform(sf::IQ(), sf::Vector3(0.2, 0.0, 0.0)));
-    AddSolidEntity(vehicle, sf::I4());
+    sf::Robot* robot = new sf::GeneralRobot("Robot", false);
+    std::vector<sf::SolidEntity*> links; 
+    robot->DefineLinks(vehicle, links);
+    robot->BuildKinematicStructure();
+
+
+    // -------------- SENSORS --------------
+
+    sf::Multibeam* mb = new sf::Multibeam("Multibeam", 120.0, 128, 1.0, 1);
+    mb->setRange(0.5, 50.0);
+    mb->setNoise(0.1);
+    robot->AddLinkSensor(mb, "ROV", sf::Transform(sf::Quaternion(M_PI_2, 0, 0), rel_mbs));
+
+    sf::MSIS* msis = new sf::MSIS(
+        "MSIS", // Name
+        0.25,   // Step angle
+        500,    // num bins
+        2.0,    // horizontal beam width
+        30.0,   // verical beam width
+        -180.0,  // min rotation
+        180.0,   // max rotation
+        0.5,    // min range
+        10.0,   // max range
+        sf::ColorMap::HOT
+    );
+    msis->setGain(1.5);
+    msis->setNoise(0.02, 0.03);
+    robot->AddVisionSensor(msis, "ROV", sf::Transform(sf::Quaternion(0, 0, M_PI_2), rel_ping));
+
+
+    // -------------- ADD ROBOT --------------
+    AddRobot(robot, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 0.0)));
 }

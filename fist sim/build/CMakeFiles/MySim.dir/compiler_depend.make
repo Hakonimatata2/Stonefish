@@ -2022,6 +2022,7 @@ CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o: /home/haakonaardal/Sto
   /usr/local/include/Stonefish/comms/Comm.h \
   /usr/local/include/Stonefish/core/Console.h \
   /usr/local/include/Stonefish/core/FeatherstoneRobot.h \
+  /usr/local/include/Stonefish/core/GeneralRobot.h \
   /usr/local/include/Stonefish/core/GraphicalSimulationApp.h \
   /usr/local/include/Stonefish/core/MaterialManager.h \
   /usr/local/include/Stonefish/core/NED.h \
@@ -3147,6 +3148,8 @@ CMakeFiles/MySim.dir/src/sc1/main.cpp.o: /home/haakonaardal/Stonefish/fist\ sim/
 /usr/local/include/Stonefish/entities/StaticEntity.h:
 
 /usr/local/include/Stonefish/core/NED.h:
+
+/usr/local/include/Stonefish/core/GeneralRobot.h:
 
 /usr/local/include/Stonefish/core/FeatherstoneRobot.h:
 
