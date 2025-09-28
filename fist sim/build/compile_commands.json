@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/haakonaardal/Stonefish/fist sim/build",
+  "command": "/usr/bin/g++ -DBT_EULER_DEFAULT_ZYX -DBT_USE_DOUBLE_PRECISION -DDATA_DIR_PATH=\"\\\"/home/haakonaardal/Stonefish/fist sim/data/\\\"\" -DSHADER_DIR_PATH=\\\"/usr/local/share/Stonefish/shaders/\\\" -isystem /usr/local/include/Stonefish -isystem /usr/include/SDL2 -isystem /usr/include/freetype2 -g -std=gnu++20 -o CMakeFiles/MySim.dir/src/sc1/main.cpp.o -c \"/home/haakonaardal/Stonefish/fist sim/src/sc1/main.cpp\"",
+  "file": "/home/haakonaardal/Stonefish/fist sim/src/sc1/main.cpp",
+  "output": "CMakeFiles/MySim.dir/src/sc1/main.cpp.o"
+},
+{
+  "directory": "/home/haakonaardal/Stonefish/fist sim/build",
+  "command": "/usr/bin/g++ -DBT_EULER_DEFAULT_ZYX -DBT_USE_DOUBLE_PRECISION -DDATA_DIR_PATH=\"\\\"/home/haakonaardal/Stonefish/fist sim/data/\\\"\" -DSHADER_DIR_PATH=\\\"/usr/local/share/Stonefish/shaders/\\\" -isystem /usr/local/include/Stonefish -isystem /usr/include/SDL2 -isystem /usr/include/freetype2 -g -std=gnu++20 -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o -c \"/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestApp.cpp\"",
+  "file": "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestApp.cpp",
+  "output": "CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o"
+},
+{
+  "directory": "/home/haakonaardal/Stonefish/fist sim/build",
+  "command": "/usr/bin/g++ -DBT_EULER_DEFAULT_ZYX -DBT_USE_DOUBLE_PRECISION -DDATA_DIR_PATH=\"\\\"/home/haakonaardal/Stonefish/fist sim/data/\\\"\" -DSHADER_DIR_PATH=\\\"/usr/local/share/Stonefish/shaders/\\\" -isystem /usr/local/include/Stonefish -isystem /usr/include/SDL2 -isystem /usr/include/freetype2 -g -std=gnu++20 -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o -c \"/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestManager.cpp\"",
+  "file": "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestManager.cpp",
+  "output": "CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o"
+}
+]

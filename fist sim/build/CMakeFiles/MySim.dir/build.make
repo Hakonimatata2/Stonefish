@@ -73,43 +73,43 @@ CMakeFiles/MySim.dir/src/sc1/main.cpp.o: CMakeFiles/MySim.dir/flags.make
 CMakeFiles/MySim.dir/src/sc1/main.cpp.o: /home/haakonaardal/Stonefish/fist\ sim/src/sc1/main.cpp
 CMakeFiles/MySim.dir/src/sc1/main.cpp.o: CMakeFiles/MySim.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/haakonaardal/Stonefish/fist sim/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/MySim.dir/src/sc1/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/MySim.dir/src/sc1/main.cpp.o -MF CMakeFiles/MySim.dir/src/sc1/main.cpp.o.d -o CMakeFiles/MySim.dir/src/sc1/main.cpp.o -c "/home/haakonaardal/Stonefish/fist sim/src/sc1/main.cpp"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/MySim.dir/src/sc1/main.cpp.o -MF CMakeFiles/MySim.dir/src/sc1/main.cpp.o.d -o CMakeFiles/MySim.dir/src/sc1/main.cpp.o -c "/home/haakonaardal/Stonefish/fist sim/src/sc1/main.cpp"
 
 CMakeFiles/MySim.dir/src/sc1/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/MySim.dir/src/sc1/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/haakonaardal/Stonefish/fist sim/src/sc1/main.cpp" > CMakeFiles/MySim.dir/src/sc1/main.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/haakonaardal/Stonefish/fist sim/src/sc1/main.cpp" > CMakeFiles/MySim.dir/src/sc1/main.cpp.i
 
 CMakeFiles/MySim.dir/src/sc1/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/MySim.dir/src/sc1/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/haakonaardal/Stonefish/fist sim/src/sc1/main.cpp" -o CMakeFiles/MySim.dir/src/sc1/main.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/haakonaardal/Stonefish/fist sim/src/sc1/main.cpp" -o CMakeFiles/MySim.dir/src/sc1/main.cpp.s
 
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o: CMakeFiles/MySim.dir/flags.make
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o: /home/haakonaardal/Stonefish/fist\ sim/src/sc1/UnderwaterTestApp.cpp
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o: CMakeFiles/MySim.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/haakonaardal/Stonefish/fist sim/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o -MF CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o.d -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o -c "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestApp.cpp"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o -MF CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o.d -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.o -c "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestApp.cpp"
 
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestApp.cpp" > CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestApp.cpp" > CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.i
 
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestApp.cpp" -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestApp.cpp" -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestApp.cpp.s
 
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o: CMakeFiles/MySim.dir/flags.make
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o: /home/haakonaardal/Stonefish/fist\ sim/src/sc1/UnderwaterTestManager.cpp
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o: CMakeFiles/MySim.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/haakonaardal/Stonefish/fist sim/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o -MF CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o.d -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o -c "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestManager.cpp"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o -MF CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o.d -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o -c "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestManager.cpp"
 
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestManager.cpp" > CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestManager.cpp" > CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.i
 
 CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestManager.cpp" -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/haakonaardal/Stonefish/fist sim/src/sc1/UnderwaterTestManager.cpp" -o CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.s
 
 # Object files for target MySim
 MySim_OBJECTS = \
