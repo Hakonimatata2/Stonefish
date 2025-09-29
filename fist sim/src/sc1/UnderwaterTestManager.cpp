@@ -52,6 +52,7 @@
 #include <Stonefish/entities/solids/Polyhedron.h>
 #include <core/GeneralRobot.h>
 #include <LinearMath/btTransform.h>
+#include <Stonefish/actuators/Push.h>
 
 UnderwaterTestManager::UnderwaterTestManager(sf::Scalar stepsPerSecond)
 : SimulationManager(stepsPerSecond, sf::SolverType::SOLVER_SI, sf::CollisionFilteringType::COLLISION_EXCLUSIVE)
@@ -61,64 +62,75 @@ UnderwaterTestManager::UnderwaterTestManager(sf::Scalar stepsPerSecond)
 void UnderwaterTestManager::BuildScenario()
 {
     // -------------- MATERIALS--------------
-    CreateMaterial("Fiberglass", sf::UnitSystem::Density(sf::CGS, sf::MKS, 1.0), 0.3);
-    CreateMaterial("Dummy", sf::UnitSystem::Density(sf::CGS, sf::MKS, 1.0), 0.3);
-    SetMaterialsInteraction("Fiberglass", "Fiberglass", 0.5, 0.2);
+    CreateMaterial("Neutral", sf::UnitSystem::Density(sf::CGS, sf::MKS, 0.9), 0.3);
+    SetMaterialsInteraction("ROV_Material", "ROV_Material", 0.5, 0.2);
+    CreateMaterial("Rock", sf::UnitSystem::Density(sf::CGS, sf::MKS, 3.0), 0.6);
     
-    // -------------- LOOKS--------------
+    // -------------- LOOKS --------------
     CreateLook("white", sf::Color::Gray(1.f), 0.9f, 0.0f, 0.f);
+    CreateLook("seabed", sf::Color::RGB(0.7f, 0.7f, 0.5f), 0.9f, 0.f, 0.f, "", sf::GetDataPath() + "sand_normal.png");
 
 
-    // -------------- OCEAN--------------
+    // -------------- OCEAN --------------
     EnableOcean(0.0);
     getOcean()->EnableCurrents();
     getAtmosphere()->SetSunPosition(0.0, 45.0);
 
-    // -------------- Physics--------------
+    // -------------- Physics --------------
     sf::BodyPhysicsSettings phy;
     phy.mode = sf::BodyPhysicsMode::SUBMERGED;
     phy.collisions = true;
     phy.buoyancy = true;
     
 
-    // -------------- Positions--------------
+    // -------------- Positions --------------
     
-    //        I BLENDER             x         z       -y
-    auto to_ref     = sf::Vector3(-0.1178, -0.6932, 0.3703);
-    auto to_dvl     = sf::Vector3(-0.2883, -0.6684, 0.2624);
-    auto to_mbs     = sf::Vector3(-0.2883, -0.6599, 0.4908);
-    auto to_ping    = sf::Vector3(-0.4100, -0.4906, 0.5206);
+    // From Blender Coordinates to NED: [x, y, z] -> [x, z, -y]
+    auto to_cg      = sf::Vector3(0, 0, 0);
+    auto to_mbs     = sf::Vector3(-0.147759, 0.0, 0.225529);
+    auto to_ping    = sf::Vector3(0.024241, 0.12, 0.255529);
     
-    auto rel_mbs = to_ref - to_mbs;
-    auto rel_ping = to_ref - to_ping;
+    auto rel_mbs = to_cg - to_mbs;
+    auto rel_ping = to_cg - to_ping;
     
     
     // -------------- DEFINING THE VEHICLE --------------
 
+    phy.buoyancy = false; // External part. Kun visuelt og fysikk for drag.
     sf::Polyhedron* vehicle = new sf::Polyhedron(
-        "ROV",                                          // navn
-        phy,                                            // BodyPhysicsSettings
-        sf::GetDataPath() + "ResiFarmBlueRov.obj",      // Vsible object
-        0.01,                                           // scale
-        sf::Transform(sf::IQ(), to_ref),                // origin transform (identity matrix)
-        sf::GetDataPath() + "sphere_R=1.obj",           // Physical object
+        "ROV_",                                              // navn
+        phy,                                                // BodyPhysicsSettings
+        sf::GetDataPath() + "BlueROV/ResiFarmBlueRov.obj",  // Vsible object
+        1.0,                                                // scale
+        sf::Transform(sf::IQ(), to_cg),                     // origin transform
+        sf::GetDataPath() + "sphere_R=1.obj",               // Physical object. Determines drag etc.
         1.0,
         sf::I4(),
-        "Fiberglass",          // material
-        "white"                // look
+        "Neutral",              // material
+        "white",                 // look (can be set to a texture)
+        0.005 // Thickness
     );
+
+    // Box defining interia etc.
+    phy.buoyancy = true;
+    sf::Box* box = new sf::Box("box", phy, sf::Vector3(0.5, 0.5, 0.5), sf::I4(), "Neutral", "white");
+
+    sf::Compound* comp = new sf::Compound("ROV", phy, vehicle, sf::I4());
+    comp->AddInternalPart(box, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 0.0)));
+    comp->setDisplayInternalParts(false);
+
     sf::Robot* robot = new sf::GeneralRobot("Robot", false);
     std::vector<sf::SolidEntity*> links; 
-    robot->DefineLinks(vehicle, links);
+    robot->DefineLinks(comp, links);
     robot->BuildKinematicStructure();
-
 
     // -------------- SENSORS --------------
 
-    sf::Multibeam* mb = new sf::Multibeam("Multibeam", 120.0, 128, 1.0, 1);
-    mb->setRange(0.5, 50.0);
-    mb->setNoise(0.1);
-    robot->AddLinkSensor(mb, "ROV", sf::Transform(sf::Quaternion(M_PI_2, 0, 0), rel_mbs));
+    sf::FLS* fls = new sf::FLS("FLS", 512, 500, 120.0, 30.0, 0.5, 10.0, sf::ColorMap::HOT);
+    fls->setGain(1.1);
+    fls->setNoise(0.01, 0.02);
+    fls->setDisplayOnScreen(true, 900, 250, 0.4f);
+    robot->AddVisionSensor(fls, "ROV", sf::Transform(sf::Quaternion(M_PI_2, 0, M_PI_2), rel_mbs));
 
     sf::MSIS* msis = new sf::MSIS(
         "MSIS", // Name
@@ -137,6 +149,21 @@ void UnderwaterTestManager::BuildScenario()
     robot->AddVisionSensor(msis, "ROV", sf::Transform(sf::Quaternion(0, 0, M_PI_2), rel_ping));
 
 
+    // -------------- ACTUATORS --------------
+    sf::Push* pushForward = new sf::Push("PushForward", false);
+    pushForward->setForceLimits(-1000.0, 1000.0);
+    robot->AddLinkActuator(pushForward, "ROV", sf::I4());
+
+    sf::Push* pushUp = new sf::Push("PushUp", false);
+    pushUp->setForceLimits(-1000.0, 1000.0);
+    robot->AddLinkActuator(pushUp, "ROV", sf::Transform(sf::Quaternion(0, M_PI_2, 0), sf::Vector3(0, 0, 0)));
+
+
     // -------------- ADD ROBOT --------------
-    AddRobot(robot, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 0.0)));
+    AddRobot(robot, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 5.0))); // 5 m under ocean surface
+
+
+    // -------------- TERRAIN --------------
+    sf::Terrain* seabed = new sf::Terrain("Seabed", sf::GetDataPath() + "terrain.png", 1.0, 1.0, 5.0, "Rock", "seabed", 5.f);
+    AddStaticEntity(seabed, sf::Transform(sf::IQ(), sf::Vector3(0,0,15.0)));
 }

@@ -1,3 +1,5 @@
+For å kjøre:
+
 cd build
 cmake ..
 cmake --build . -j
@@ -6,5 +8,6 @@ cmake --build . -j
 
 Eller bruk:
 
+CTRL + Shift + P -> CMake: Configure (Kun en gang)
 CTRL + Shift + P -> CMake: Build
 Shift + F5
