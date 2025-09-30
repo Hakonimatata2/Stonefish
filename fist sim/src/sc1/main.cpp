@@ -24,7 +24,7 @@ int main(int argc, const char * argv[])
     h.showForces = false;
     
     UnderwaterTestManager simulationManager(200.0);
-    simulationManager.setRealtimeFactor(1.0);
+    simulationManager.setRealtimeFactor(2.0);
     UnderwaterTestApp app(std::string(DATA_DIR_PATH), s, h, &simulationManager);
     app.Run();
     

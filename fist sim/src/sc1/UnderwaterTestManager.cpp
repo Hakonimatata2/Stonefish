@@ -63,6 +63,7 @@ void UnderwaterTestManager::BuildScenario()
 {
     // -------------- MATERIALS--------------
     CreateMaterial("Neutral", sf::UnitSystem::Density(sf::CGS, sf::MKS, 0.9), 0.3);
+    CreateMaterial("ROV_Material", sf::UnitSystem::Density(sf::CGS, sf::MKS, 1.0), 0.3);
     SetMaterialsInteraction("ROV_Material", "ROV_Material", 0.5, 0.2);
     CreateMaterial("Rock", sf::UnitSystem::Density(sf::CGS, sf::MKS, 3.0), 0.6);
     
@@ -86,42 +87,45 @@ void UnderwaterTestManager::BuildScenario()
     // -------------- Positions --------------
     
     // From Blender Coordinates to NED: [x, y, z] -> [x, z, -y]
-    auto to_cg      = sf::Vector3(0, 0, 0);
+    auto to_ref      = sf::Vector3(0, 0, 0);
     auto to_mbs     = sf::Vector3(-0.147759, 0.0, 0.225529);
     auto to_ping    = sf::Vector3(0.024241, 0.12, 0.255529);
     
-    auto rel_mbs = to_cg - to_mbs;
-    auto rel_ping = to_cg - to_ping;
+    auto rel_mbs = to_ref - to_mbs;
+    auto rel_ping = to_ref - to_ping;
     
     
     // -------------- DEFINING THE VEHICLE --------------
 
-    phy.buoyancy = false; // External part. Kun visuelt og fysikk for drag.
+    phy.buoyancy = true; // External part. Kun visuelt og fysikk for drag.
     sf::Polyhedron* vehicle = new sf::Polyhedron(
-        "ROV_",                                              // navn
-        phy,                                                // BodyPhysicsSettings
-        sf::GetDataPath() + "BlueROV/ResiFarmBlueRov.obj",  // Vsible object
-        1.0,                                                // scale
-        sf::Transform(sf::IQ(), to_cg),                     // origin transform
-        sf::GetDataPath() + "sphere_R=1.obj",               // Physical object. Determines drag etc.
-        1.0,
-        sf::I4(),
-        "Neutral",              // material
-        "white",                 // look (can be set to a texture)
-        0.005 // Thickness
+        "Vehicle",                                                      // navn
+        phy,                                                            // BodyPhysicsSettings
+        // sf::GetDataPath() + "BlueROV/ResiFarmBlueRov.obj",              // Vsible object
+        sf::GetDataPath() + "BlueROV/ResiFarmBlueRov-simplified.obj",              // Vsible object
+        1.0,                                                            // scale
+        sf::Transform(sf::IQ(), to_ref),                                // origin transform
+        sf::GetDataPath() + "BlueROV/ResiFarmBlueRov-simplified.obj",   // Physical object. Determines drag etc.
+        1.0,                                                            // scale
+        sf::I4(),                                                       // trasform
+        "ROV_Material",                                                 // material
+        "white"                                                         // look (can be set to a texture)
     );
+    sf::Compound* uuv = new sf::Compound("UUV", phy, vehicle, sf::I4());
 
     // Box defining interia etc.
     phy.buoyancy = true;
     sf::Box* box = new sf::Box("box", phy, sf::Vector3(0.5, 0.5, 0.5), sf::I4(), "Neutral", "white");
 
-    sf::Compound* comp = new sf::Compound("ROV", phy, vehicle, sf::I4());
-    comp->AddInternalPart(box, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 0.0)));
-    comp->setDisplayInternalParts(false);
+    // -------------- ADD EXTRA PARTS HERE --------------
+    // uuv->AddInternalPart(box, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 0.0)));
 
+    uuv->setDisplayInternalParts(false);
+
+    // Define vehicle as a single link robot
     sf::Robot* robot = new sf::GeneralRobot("Robot", false);
     std::vector<sf::SolidEntity*> links; 
-    robot->DefineLinks(comp, links);
+    robot->DefineLinks(uuv, links);
     robot->BuildKinematicStructure();
 
     // -------------- SENSORS --------------
@@ -130,7 +134,7 @@ void UnderwaterTestManager::BuildScenario()
     fls->setGain(1.1);
     fls->setNoise(0.01, 0.02);
     fls->setDisplayOnScreen(true, 900, 250, 0.4f);
-    robot->AddVisionSensor(fls, "ROV", sf::Transform(sf::Quaternion(M_PI_2, 0, M_PI_2), rel_mbs));
+    robot->AddVisionSensor(fls, "UUV", sf::Transform(sf::Quaternion(M_PI_2, 0, M_PI_2), rel_mbs));
 
     sf::MSIS* msis = new sf::MSIS(
         "MSIS", // Name
@@ -146,17 +150,20 @@ void UnderwaterTestManager::BuildScenario()
     );
     msis->setGain(1.5);
     msis->setNoise(0.02, 0.03);
-    robot->AddVisionSensor(msis, "ROV", sf::Transform(sf::Quaternion(0, 0, M_PI_2), rel_ping));
+    robot->AddVisionSensor(msis, "UUV", sf::Transform(sf::Quaternion(0, 0, M_PI_2), rel_ping));
 
 
     // -------------- ACTUATORS --------------
+    sf::Transform to_cg_transform = uuv->getCGTransform();
+    sf::Vector3 to_cg_vec = to_cg_transform.getOrigin(); 
+
     sf::Push* pushForward = new sf::Push("PushForward", false);
     pushForward->setForceLimits(-1000.0, 1000.0);
-    robot->AddLinkActuator(pushForward, "ROV", sf::I4());
+    robot->AddLinkActuator(pushForward, "UUV", sf::Transform(sf::IQ(), to_cg_vec));
 
     sf::Push* pushUp = new sf::Push("PushUp", false);
     pushUp->setForceLimits(-1000.0, 1000.0);
-    robot->AddLinkActuator(pushUp, "ROV", sf::Transform(sf::Quaternion(0, M_PI_2, 0), sf::Vector3(0, 0, 0)));
+    robot->AddLinkActuator(pushUp, "UUV", sf::Transform(sf::Quaternion(0, M_PI_2, 0), to_cg_vec));
 
 
     // -------------- ADD ROBOT --------------

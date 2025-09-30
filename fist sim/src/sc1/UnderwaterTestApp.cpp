@@ -28,7 +28,7 @@ void UnderwaterTestApp::InitializeGUI()
 void UnderwaterTestApp::DoHUD()
 {
     GraphicalSimulationApp::DoHUD();
-    applyThrusters();
+    applyVelocity();
 }
 
 // Tast ned
@@ -41,11 +41,29 @@ void UnderwaterTestApp::KeyDown(SDL_Event* event) {
             case SDLK_k:
                 in.back = true; 
                 break;
-            case SDLK_u:
+            case SDLK_SPACE:
                 in.up = true; 
                 break;
-            case SDLK_o:
+            case SDLK_LSHIFT:
                 in.down = true; 
+                break;
+            case SDLK_j:
+                in.left = true;
+                break;
+            case SDLK_l:
+                in.right = true;
+                break;
+            case SDLK_n:
+                in.pitchUp = true;
+                break;
+            case SDLK_m:
+                in.pitchDown = true;
+                break;
+            case SDLK_u:
+                in.yawL = true;
+                break;
+            case SDLK_o:
+                in.yawR = true;
                 break;
             default: 
                 break;
@@ -64,11 +82,29 @@ void UnderwaterTestApp::KeyUp(SDL_Event* event) {
             case SDLK_k:
                 in.back = false; 
                 break;
-            case SDLK_u:
+            case SDLK_SPACE:
                 in.up = false; 
                 break;
-            case SDLK_o:
+            case SDLK_LSHIFT:
                 in.down = false; 
+                break;
+            case SDLK_j:
+                in.left = false;
+                break;
+            case SDLK_l:
+                in.right = false;
+                break;
+            case SDLK_n:
+                in.pitchUp = false;
+                break;
+            case SDLK_m:
+                in.pitchDown = false;
+                break;
+            case SDLK_u:
+                in.yawL = false;
+                break;
+            case SDLK_o:
+                in.yawR = false;
                 break;
             default: 
                 break;
@@ -79,19 +115,41 @@ void UnderwaterTestApp::KeyUp(SDL_Event* event) {
 
 
 
-void UnderwaterTestApp::applyThrusters() {
+void UnderwaterTestApp::applyVelocity() {
     // Get actuators
     sf::Push* pushForward = (sf::Push*)getSimulationManager()->getActuator("PushForward");
     sf::Push* pushUp = (sf::Push*)getSimulationManager()->getActuator("PushUp");
 
-    float gain = 1000.0f;
+    float speed = 0.2f;
 
     // Get force based on input
-    const sf::Scalar surge = gain * sf::Scalar((in.fwd?1:0) - (in.back?1:0));
-    const sf::Scalar heave = gain * sf::Scalar((in.up?1:0) - (in.down?1:0));
-
+    const sf::Scalar surge = speed * sf::Scalar((in.fwd?1:0) - (in.back?1:0)); // Fram  og tilbake
+    const sf::Scalar heave = speed * sf::Scalar((in.up?1:0) - (in.down?1:0)); // opp og ned
+    const sf::Scalar sway = speed * sf::Scalar((in.right?1:0) - (in.left?1:0)); // Høyre venstre
+    const sf::Scalar pitch = 5*speed * sf::Scalar((in.pitchUp?1:0) - (in.pitchDown?1:0));
+    const sf::Scalar yaw = 5*speed * sf::Scalar((in.yawL?1:0) - (in.yawR?1:0));
+    
     // Apply forces
-    pushForward->setForce(surge);
-    pushUp->setForce(heave);
- 
+    // pushForward->setForce(surge);
+    // pushUp->setForce(heave);
+
+    auto* sim = getSimulationManager();
+    auto* robot = sim->getRobot("Robot");
+    if (robot) {
+        auto* rb = robot->getBaseLink()->getRigidBody();
+        if (!rb) return;
+
+        sf::Vector3 world_lin_vel = sf::Vector3(surge, heave, sway);
+        sf::Vector3 world_ang_vel = sf::Vector3(0, yaw, pitch);
+
+        // Transformation from world to body
+        auto rotation = robot->getBaseLink()->getCGTransform().getRotation();
+
+        btVector3 body_lin_vel = quatRotate(rotation, world_lin_vel);
+        btVector3 body_ang_vel = quatRotate(rotation, world_ang_vel);
+
+
+        rb->setLinearVelocity(body_lin_vel);
+        rb->setAngularVelocity(body_ang_vel);
+    }
 }

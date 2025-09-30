@@ -21,13 +21,14 @@ public:
         bool yawL=false, yawR=false;  
         bool up=false, down=false;    
         bool left=false, right=false; 
+        bool pitchUp=false, pitchDown=false;
         bool turbo=false;             
     } in;
 
     // Cotnrol the ROV
     void KeyDown(SDL_Event* event) override;
     void KeyUp(SDL_Event* event) override;
-    void applyThrusters();
+    void applyVelocity();
     
 private:
     sf::OpenGLPrinter* largePrint;
