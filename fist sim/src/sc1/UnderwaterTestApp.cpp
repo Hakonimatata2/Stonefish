@@ -116,22 +116,19 @@ void UnderwaterTestApp::KeyUp(SDL_Event* event) {
 
 
 void UnderwaterTestApp::applyVelocity() {
-    // Get actuators
-    sf::Push* pushForward = (sf::Push*)getSimulationManager()->getActuator("PushForward");
-    sf::Push* pushUp = (sf::Push*)getSimulationManager()->getActuator("PushUp");
 
     float speed = 0.2f;
 
     // Get force based on input
     const sf::Scalar surge = speed * sf::Scalar((in.fwd?1:0) - (in.back?1:0)); // Fram  og tilbake
-    const sf::Scalar heave = speed * sf::Scalar((in.up?1:0) - (in.down?1:0)); // opp og ned
     const sf::Scalar sway = speed * sf::Scalar((in.right?1:0) - (in.left?1:0)); // Høyre venstre
+    const sf::Scalar heave = speed * sf::Scalar((in.up?1:0) - (in.down?1:0)); // opp og ned
     const sf::Scalar pitch = 5*speed * sf::Scalar((in.pitchUp?1:0) - (in.pitchDown?1:0));
     const sf::Scalar yaw = 5*speed * sf::Scalar((in.yawL?1:0) - (in.yawR?1:0));
-    
-    // Apply forces
-    // pushForward->setForce(surge);
-    // pushUp->setForce(heave);
+
+    const bool anyLin = (surge != 0 || sway != 0 || heave != 0);
+    const bool anyAng = (pitch != 0 || yaw != 0);
+    if (!anyLin && !anyAng) return;  // no input, return
 
     auto* sim = getSimulationManager();
     auto* robot = sim->getRobot("Robot");
@@ -139,8 +136,8 @@ void UnderwaterTestApp::applyVelocity() {
         auto* rb = robot->getBaseLink()->getRigidBody();
         if (!rb) return;
 
-        sf::Vector3 world_lin_vel = sf::Vector3(surge, heave, sway);
-        sf::Vector3 world_ang_vel = sf::Vector3(0, yaw, pitch);
+        sf::Vector3 world_lin_vel = sf::Vector3(surge, sway, -heave);
+        sf::Vector3 world_ang_vel = sf::Vector3(0, yaw, -pitch);
 
         // Transformation from world to body
         auto rotation = robot->getBaseLink()->getCGTransform().getRotation();

@@ -11,6 +11,12 @@ public:
     UnderwaterTestManager(sf::Scalar stepsPerSecond);
     
     void BuildScenario();
+
+private:
+
+    void BuildRobot(sf::Vector3 position, sf::BodyPhysicsSettings& phy);
+
+
 };
 
 #endif

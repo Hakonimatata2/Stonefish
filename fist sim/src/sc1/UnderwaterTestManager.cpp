@@ -53,6 +53,7 @@
 #include <core/GeneralRobot.h>
 #include <LinearMath/btTransform.h>
 #include <Stonefish/actuators/Push.h>
+#include <Stonefish/actuators/Light.h>
 
 UnderwaterTestManager::UnderwaterTestManager(sf::Scalar stepsPerSecond)
 : SimulationManager(stepsPerSecond, sf::SolverType::SOLVER_SI, sf::CollisionFilteringType::COLLISION_EXCLUSIVE)
@@ -62,13 +63,9 @@ UnderwaterTestManager::UnderwaterTestManager(sf::Scalar stepsPerSecond)
 void UnderwaterTestManager::BuildScenario()
 {
     // -------------- MATERIALS--------------
-    CreateMaterial("Neutral", sf::UnitSystem::Density(sf::CGS, sf::MKS, 0.9), 0.3);
-    CreateMaterial("ROV_Material", sf::UnitSystem::Density(sf::CGS, sf::MKS, 1.0), 0.3);
-    SetMaterialsInteraction("ROV_Material", "ROV_Material", 0.5, 0.2);
     CreateMaterial("Rock", sf::UnitSystem::Density(sf::CGS, sf::MKS, 3.0), 0.6);
     
     // -------------- LOOKS --------------
-    CreateLook("white", sf::Color::Gray(1.f), 0.9f, 0.0f, 0.f);
     CreateLook("seabed", sf::Color::RGB(0.7f, 0.7f, 0.5f), 0.9f, 0.f, 0.f, "", sf::GetDataPath() + "sand_normal.png");
 
 
@@ -84,43 +81,89 @@ void UnderwaterTestManager::BuildScenario()
     phy.buoyancy = true;
     
 
+    // -------------- Robot --------------
+    BuildRobot(sf::Vector3(0, 0, -2), phy);
+
+    // -------------- TERRAIN --------------
+    sf::Terrain* seabed = new sf::Terrain(
+        "Seabed",                           // name 
+        sf::GetDataPath() + "terrain.png",  // height map
+        1.0,                                // scale x
+        1.0,                                // scale y
+        5.0,                                // height
+        "Rock",                             // material
+        "seabed",                           // look
+        5.f                                 // uv scale (scale of texture coordinates)
+    );
+    AddStaticEntity(seabed, sf::Transform(sf::IQ(), sf::Vector3(0,0,15.0)));
+}
+
+void UnderwaterTestManager::BuildRobot(sf::Vector3 position, sf::BodyPhysicsSettings &phy)
+{
+    // UUV look and texture
+    CreateLook(
+        "blueRovTexture",
+        sf::Color::Gray(1.f),                       // color tint
+        0.1f, 0.0f, 0.0f,                           // roughness, metalness, reflectivity
+        sf::GetDataPath() + "BlueROV/BlueRov.png",  // ALBEDO texture
+        ""                                          // NORMAL texture
+    );
+
+    CreateLook("white", sf::Color::Gray(1.f), 0.9f, 0.0f, 0.f);
+    CreateMaterial("ROV_Material", sf::UnitSystem::Density(sf::CGS, sf::MKS, 1.0), 0.3);
+    CreateMaterial("Neutral", sf::UnitSystem::Density(sf::CGS, sf::MKS, 1.0), 0.3);
+
     // -------------- Positions --------------
-    
-    // From Blender Coordinates to NED: [x, y, z] -> [x, z, -y]
-    auto to_ref      = sf::Vector3(0, 0, 0);
-    auto to_mbs     = sf::Vector3(-0.147759, 0.0, 0.225529);
-    auto to_ping    = sf::Vector3(0.024241, 0.12, 0.255529);
-    
-    auto rel_mbs = to_ref - to_mbs;
-    auto rel_ping = to_ref - to_ping;
-    
+    // From Blender Coordinates to NED: [x, y, z] -> [-x, -y, -z]
+    auto toMBS      = - sf::Vector3(-0.147759, 0.0, 0.225529);
+    auto toPing     = - sf::Vector3(0.024241, 0.12, 0.255529);
+    auto toCamera   = - sf::Vector3(0.13, 0, 0.153);
     
     // -------------- DEFINING THE VEHICLE --------------
-
-    phy.buoyancy = true; // External part. Kun visuelt og fysikk for drag.
+    phy.buoyancy = false;
     sf::Polyhedron* vehicle = new sf::Polyhedron(
         "Vehicle",                                                      // navn
         phy,                                                            // BodyPhysicsSettings
-        // sf::GetDataPath() + "BlueROV/ResiFarmBlueRov.obj",              // Vsible object
-        sf::GetDataPath() + "BlueROV/ResiFarmBlueRov-simplified.obj",              // Vsible object
+        // sf::GetDataPath() + "BlueROV/ROV_with_uv.obj",                  // Vsible object
+        sf::GetDataPath() + "BlueROV/ResiFarmBlueRov-simplified.obj",   // Vsible object
         1.0,                                                            // scale
-        sf::Transform(sf::IQ(), to_ref),                                // origin transform
+        sf::I4(),                                                       // origin transform
         sf::GetDataPath() + "BlueROV/ResiFarmBlueRov-simplified.obj",   // Physical object. Determines drag etc.
         1.0,                                                            // scale
         sf::I4(),                                                       // trasform
         "ROV_Material",                                                 // material
-        "white"                                                         // look (can be set to a texture)
+        "blueRovTexture",                                               // look
+        0.005                                                           // thickness
     );
     sf::Compound* uuv = new sf::Compound("UUV", phy, vehicle, sf::I4());
 
-    // Box defining interia etc.
+
+    sf::Scalar mass = 14.7;
+    sf::Scalar rhoWater = 1000.0; // kg/m^3, 1025.0 sea water
+    sf::Scalar initialVol = uuv->getVolume();
+    sf::Scalar desiredVolume = mass / rhoWater;
+    sf::Scalar volumeToAdd = desiredVolume - initialVol;
+    sf::Scalar sideLength = std::cbrt(volumeToAdd); // cube root
+    
+    // Add volume
     phy.buoyancy = true;
-    sf::Box* box = new sf::Box("box", phy, sf::Vector3(0.5, 0.5, 0.5), sf::I4(), "Neutral", "white");
-
-    // -------------- ADD EXTRA PARTS HERE --------------
-    // uuv->AddInternalPart(box, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 0.0)));
-
+    sf::Box* box = new sf::Box(
+        "box", 
+        phy, 
+        sf::Vector3(sideLength, sideLength, sideLength), 
+        sf::Transform(sf::IQ(), sf::Vector3(0, 0, 0)), 
+        "Neutral", 
+        "white"
+    );
+    uuv->AddInternalPart(box, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 0.0)));
     uuv->setDisplayInternalParts(false);
+
+    // Set correct inertia and CG
+    uuv->SetArbitraryPhysicalProperties(
+        mass,                                           // mass
+        sf::Vector3(1, 1, 1),                           // Ixx, Iyy, Izz
+        sf::Transform(sf::IQ(), sf::Vector3(0, 0, 0))   // CG
+    );
 
     // Define vehicle as a single link robot
     sf::Robot* robot = new sf::GeneralRobot("Robot", false);
@@ -130,12 +173,14 @@ void UnderwaterTestManager::BuildScenario()
 
     // -------------- SENSORS --------------
 
+    // Multibeam sonar / forward looking sonar
     sf::FLS* fls = new sf::FLS("FLS", 512, 500, 120.0, 30.0, 0.5, 10.0, sf::ColorMap::HOT);
     fls->setGain(1.1);
     fls->setNoise(0.01, 0.02);
     fls->setDisplayOnScreen(true, 900, 250, 0.4f);
-    robot->AddVisionSensor(fls, "UUV", sf::Transform(sf::Quaternion(M_PI_2, 0, M_PI_2), rel_mbs));
+    robot->AddVisionSensor(fls, "UUV", sf::Transform(sf::Quaternion(M_PI_2, 0, M_PI_2), toMBS));
 
+    // Ping 360
     sf::MSIS* msis = new sf::MSIS(
         "MSIS", // Name
         0.25,   // Step angle
@@ -150,7 +195,22 @@ void UnderwaterTestManager::BuildScenario()
     );
     msis->setGain(1.5);
     msis->setNoise(0.02, 0.03);
-    robot->AddVisionSensor(msis, "UUV", sf::Transform(sf::Quaternion(0, 0, M_PI_2), rel_ping));
+    robot->AddVisionSensor(msis, "UUV", sf::Transform(sf::Quaternion(0, 0, M_PI_2), toPing));
+
+    // Camera
+    sf::ColorCamera* cam = new sf::ColorCamera(
+        "Cam",  // name
+        800,    // res x
+        600,    // res y
+        60.0,   // horizontal fov
+        10.0    // fps
+    );
+    // robot->AddVisionSensor(cam, "UUV", sf::I4());
+
+    // Lights 
+    auto toLight1   = sf::Transform(sf::IQ(), -sf::Vector3(0.13, 0, 0.153));
+    sf::Light* l1 = new sf::Light("Spot", 0.1, 30.0, sf::Color::BlackBody(5600.0), 2000.0);
+    // robot->AddLinkActuator(l1, "UUV", toLight1);
 
 
     // -------------- ACTUATORS --------------
@@ -167,10 +227,6 @@ void UnderwaterTestManager::BuildScenario()
 
 
     // -------------- ADD ROBOT --------------
-    AddRobot(robot, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, 5.0))); // 5 m under ocean surface
+    AddRobot(robot, sf::Transform(sf::IQ(), sf::Vector3(0.0, 0.0, -1.0)));
 
-
-    // -------------- TERRAIN --------------
-    sf::Terrain* seabed = new sf::Terrain("Seabed", sf::GetDataPath() + "terrain.png", 1.0, 1.0, 5.0, "Rock", "seabed", 5.f);
-    AddStaticEntity(seabed, sf::Transform(sf::IQ(), sf::Vector3(0,0,15.0)));
 }

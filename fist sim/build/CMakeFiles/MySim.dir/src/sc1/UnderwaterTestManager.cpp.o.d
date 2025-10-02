@@ -966,4 +966,5 @@ CMakeFiles/MySim.dir/src/sc1/UnderwaterTestManager.cpp.o: \
  /usr/local/include/Stonefish/core/NED.h \
  /usr/local/include/Stonefish/entities/solids/Polyhedron.h \
  /usr/local/include/Stonefish/core/GeneralRobot.h \
- /usr/local/include/Stonefish/actuators/Push.h
+ /usr/local/include/Stonefish/actuators/Push.h \
+ /usr/local/include/Stonefish/actuators/Light.h
